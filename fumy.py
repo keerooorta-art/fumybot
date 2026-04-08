@@ -3620,8 +3620,22 @@ def make_closing_tag(opening_tag_str: str) -> str:
 
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message_time = update.message.date.astimezone(utc_plus_3)  # Преобразование времени в UTC+3
-    chat_id = str(update.message.chat_id)  # Преобразуем chat_id в строку для унификации
+    # --- ДОБАВЛЯЕМ БЛОК СЮДА ---
+    message_time = update.message.date.astimezone(utc_plus_3)
+    if message_time < BOT_START_TIME:
+        text = update.message.text or ""
+        is_reply_to_bot = bool(update.message.reply_to_message and update.message.reply_to_message.from_user.id == context.bot.id)
+        contains_fumi = bool(re.search(r"^фуми", text, re.IGNORECASE))
+        
+        if is_reply_to_bot or contains_fumi:
+            try:
+                await update.message.reply_text("Извините, кажется бот упал, но сейчас был восстановлен. Напишите ваше сообщение ещё раз 🦊")
+            except Exception:
+                pass
+        return
+    # ---------------------------
+
+    chat_id = str(update.message.chat_id)
     
     logger.info("Обработка сообщения в чате %s", chat_id)
     relevant_messages = get_relevant_context(chat_id)
@@ -5242,9 +5256,18 @@ async def generate_inpaint_gemini(image_file_path: str, instructions: str):
 
 
 async def handle_image(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # --- ЗАМЕНЯЕМ СТАРЫЙ БЛОК НА ЭТОТ ---
     message_time = update.message.date.astimezone(utc_plus_3)
     if message_time < BOT_START_TIME:
-        logger.info("Изображение отправлено до запуска бота и будет проигнорировано.")
+        caption = update.message.caption or ""
+        is_reply_to_bot = bool(update.message.reply_to_message and update.message.reply_to_message.from_user.id == context.bot.id)
+        contains_fumi = bool(re.search(r"фуми", caption, re.IGNORECASE))
+        
+        if is_reply_to_bot or contains_fumi:
+            try:
+                await update.message.reply_text("Извините, кажется бот упал, но сейчас был восстановлен. Напишите ваше сообщение ещё раз 🦊")
+            except Exception:
+                pass
         return
 
     caption = update.message.caption or ""
