@@ -1173,9 +1173,13 @@ async def send_keys(update_or_query, context: ContextTypes.DEFAULT_TYPE, index: 
     # Проверка: это последняя ссылка?
     if url.endswith("V2RayRoot/V2RayConfig/refs/heads/main/Config/vless.txt"):
         selected_keys = random.sample(keys, min(7, len(keys)))
+        
+        # Выносим объединение строк в отдельную переменную
+        keys_str = html.escape('\n\n'.join(selected_keys))
+        
         msg_text = (
             f"<b>{repo_name}</b>\n\n7 случайных ключей:\n"
-            f"<pre>{html.escape('\n\n'.join(selected_keys))}</pre>"
+            f"<pre>{keys_str}</pre>"
         )
     else:
         # Стандартная логика
@@ -1183,9 +1187,13 @@ async def send_keys(update_or_query, context: ContextTypes.DEFAULT_TYPE, index: 
         selected_top = random.sample(top_keys, min(5, len(top_keys)))
         selected_all = random.sample(keys, min(3, len(keys)))
 
+        # Выносим объединение строк в отдельные переменные
+        top_str = html.escape('\n\n'.join(selected_top))
+        all_str = html.escape('\n\n'.join(selected_all))
+
         msg_text = (
-            f"<b>{repo_name}</b>\n\n5 новых случайных ключей:\n<pre>{html.escape('\n\n'.join(selected_top))}</pre>\n\n"
-            f"\n3 случайных ключа:\n<pre>{html.escape('\n\n'.join(selected_all))}</pre>"
+            f"<b>{repo_name}</b>\n\n5 новых случайных ключей:\n<pre>{top_str}</pre>\n\n"
+            f"\n3 случайных ключа:\n<pre>{all_str}</pre>"
         )
 
     # Клавиатура с кнопками
